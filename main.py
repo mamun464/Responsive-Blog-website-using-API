@@ -1,12 +1,27 @@
 import random
 
 
-from flask import Flask,render_template
+from flask import Flask, render_template, request
 import requests
 all_post=[]
 
 app=Flask(__name__)
 
+def sentMail(msg):
+    import smtplib
+    email="your.ex.daddy8@gmail.com"
+    password="lpgfzommjqmtjlda"
+
+    with smtplib.SMTP("smtp.gmail.com") as connection:
+        connection.starttls()
+        connection.login(user=email,password=password)
+        connection.sendmail(
+            from_addr=email,
+            to_addrs="mamunurrashid.s.bd@gmail.com",
+            msg=f"Subject: Feedback from Bloging site\n\n {msg}"
+
+        )
+    print("sent mail")
 
 @app.route('/')
 @app.route('/index/')
@@ -38,7 +53,22 @@ def post(post_id):
 
 
     return render_template('post.html', posts=req_post)
-            
+
+@app.route('/contact', methods=["POST"])
+def receive_data():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        phn = request.form['phn']
+        msg = request.form['msg']
+
+        body=f"Name:{name}\n" \
+             f"Email: {email}\n" \
+             f"Cell: {phn}\n" \
+             f"Message: {msg}\n"
+        sentMail(body)
+
+    return render_template('form-entry.html',msg="Msg sent successfuly")
         
     
     
